@@ -17,12 +17,15 @@ server <- function(input, output, session) {
 
   # include the js code
   # includeScript("mycode.js")
+
   
   output$text <- renderText({
     paste("Input text is:", input$text)
   })
 
   observe({
+    iniTime <- Sys.time()
+    
     textCleansed <- clean(input$text)
     if(textCleansed != " ") 
     {
@@ -34,8 +37,9 @@ server <- function(input, output, session) {
       predictWords <- predict_model(textCleansed)
       updateSelectInput(session = session, inputId = "predicts", choices = predictWords)
 
+      endTime <- Sys.time()
       output$msg <- renderText({
-        paste(msg)
+        paste(msg, "\n", sprintf("- Total time processing = %6.3f msecs",1000*(endTime-iniTime)))
       })
     }  
   })
@@ -46,13 +50,12 @@ ui <- fluidPage(
   	titlePanel("Data Science Capstone Project - Sergio Vicente"),
   	fluidRow(HTML("<div style='margin-left:18px;margin-bottom:12px;color:navy;'><strong>Creation date: Jan.2016</strong></div>") ),
   	    
-  	
   	# User interface controls1
     sidebarLayout(
 	    sidebarPanel(
-			p("Input a text and press <ENTER> or 'Next Word' to see what is predicted:"),	
+			p("Input a word or text and press <ENTER> or click <Predict> to see the next word(s) suggestions:"),	
 			textInput(inputId="text", label = ""),
-			submitButton("Next Word"),
+			submitButton("Predict"),
 			HTML('<script type="text/javascript"> 
         document.getElementById("text").focus();
         </script>')
@@ -66,6 +69,9 @@ ui <- fluidPage(
               verbatimTextOutput("text"),
               verbatimTextOutput("cleaned"), verbatimTextOutput("msg"),
               selectInput("predicts","Word predictions:",choices=c(""))
+      	    ),
+		   	    conditionalPanel(condition = "input.text != '' && nGram==1",
+		   	      HTML("<img src='wordcloud.png' style='width:90px;height:90px;border:solid 1pt #c0c0c0;'/>")
 		   	    )
 		   	  ),                 
 			    tabPanel("Documentation", htmlOutput("help"),
