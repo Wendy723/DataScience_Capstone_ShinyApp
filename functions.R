@@ -18,6 +18,7 @@ df3 <- readRDS("trigrams.rds")
 df4 <- readRDS("fourgrams.rds")
 
 msg <- ""
+nGram <- 0
 
 # these functions makes cleansing in input parameter
 
@@ -91,7 +92,7 @@ find_in_grams <- function(lastW, n) {
     # if matches, return the 5 top Words (without any spaces)
     top5words <- head(gsub(lastW,"",dfsub$Word),5)
 #    top5words <- head(dfsub$Word,5)
-    msg <<- sprintf("Next word was predicted with %2d-gram dataframe.",(n+1))
+    msg <<- sprintf("Next word was predicted with %1d-gram dataframe.",(n+1))
     return( gsub("[[:space:]]"," ",top5words) )
   }
   else{
@@ -102,7 +103,8 @@ find_in_grams <- function(lastW, n) {
     }
     else {
       lastW <- substr(lastW,2,nchar(lastW))
-      msg <<- paste("Next word not found in 2, 3 or 4-grams dataframes.\nReturning the",TOP_FREQ,"most frequent words")
+      msg <<- paste("Next word not found in 2, 3 or 4-grams dataframes.\nReturning the",TOP_FREQ,"most frequent words of uni-gram.")
+      nGram <<- 1
       return(get_top(TOP_FREQ))
     }
   }
@@ -115,9 +117,9 @@ predict_model <- function(user_input) {
 ## 	TASKS TO FINISH  ##
 
 #	Separate uni-grams by probability order of frequency  -- OK
-# Right message when not find any match (n-gram)  -- OK
-#	Documentation help (html)  -- in progress...
-#	Write and publish RPubs slide deck  -- in progress...
+#	Right message when not find any match (n-gram)  -- OK
+#	Documentation help (html)  -- OK
+#	Write and publish RPubs slide deck  -- OK
 #	Try to show cleansed text and word predictions only after user <ENTER> your input   -- OK
 # #	Strategy to process another language (Germany)  -- in progress...
 # #  Tab to Configure the app
