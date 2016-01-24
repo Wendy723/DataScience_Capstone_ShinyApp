@@ -15,10 +15,6 @@ source("functions.R")
 
 server <- function(input, output, session) {
 
-  # include the js code
-  # includeScript("mycode.js")
-
-  
   output$text <- renderText({
     paste("Input text is:", input$text)
   })
@@ -41,16 +37,16 @@ server <- function(input, output, session) {
       output$msg <- renderText({
         paste(msg, "\n", sprintf("- Total time processing = %6.3f msecs",1000*(endTime-iniTime)))
       })
+      gc()
     }  
   })
 }
 
 ui <- fluidPage(
 	# Application title
-  	titlePanel("Data Science Capstone Project - Sergio Vicente"),
-  	fluidRow(HTML("<div style='margin-left:18px;margin-bottom:12px;color:navy;'><strong>Creation date: Jan.2016</strong></div>") ),
+  	titlePanel("Data Science Capstone Project - Next Word Prediction App"),
   	    
-  	# User interface controls1
+  # User interface controls1
     sidebarLayout(
 	    sidebarPanel(
 			p("Input a word or text and press <ENTER> or click <Predict> to see the next word(s) suggestions:"),	
@@ -69,10 +65,7 @@ ui <- fluidPage(
               verbatimTextOutput("text"),
               verbatimTextOutput("cleaned"), verbatimTextOutput("msg"),
               selectInput("predicts","Word predictions:",choices=c(""))
-      	    ),
-		   	    conditionalPanel(condition = "input.text != '' && nGram==1",
-		   	      HTML("<img src='wordcloud.png' style='width:90px;height:90px;border:solid 1pt #c0c0c0;'/>")
-		   	    )
+      	    )
 		   	  ),                 
 			    tabPanel("Documentation", htmlOutput("help"),
 			    	tags$div(id="help", 
@@ -81,7 +74,12 @@ ui <- fluidPage(
 			    )
 			)
 		)
-	)
+  ),
+  
+	fluidRow(HTML("<div style='margin-left:18px;margin-bottom:12px;color:navy;'><strong>Creation date: Jan.2016</strong></div>") ),
+	fluidRow(HTML("<div style='margin-left:18px;margin-bottom:12px;margin-top:-12px;color:navy;'><strong><big>By <a title='Write to me!...' 
+      href='mailto:svicente99@yahoo.com'>Sergio Vicente</a></big></strong>&nbsp;&nbsp;&nbsp;&nbsp;
+      &hearts;&nbsp;<a title='Know my blog' target='_blank' href='http://svicente99.wordpress.com'>About me</a>&nbsp;&spades;</div>") )
 )
 
 

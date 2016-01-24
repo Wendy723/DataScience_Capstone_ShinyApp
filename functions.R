@@ -18,7 +18,6 @@ df3 <- readRDS("trigrams.rds")
 df4 <- readRDS("fourgrams.rds")
 
 msg <- ""
-nGram <- 0
 
 # these functions makes cleansing in input parameter
 
@@ -59,7 +58,22 @@ get_last_words <- function(lst, n) {
   return(lst)
 }
 
-get_top <- function(n=5) {
+# some heuristcs applyed before returning to the server interface
+
+contractions <- function(token) {
+  token <- gsub("^s\\s","\'s ",token)
+  token <- gsub("^n\\s","\'n ",token)
+  token <- gsub("^d\\s","\'d ",token)
+  token <- gsub("^t\\s","\'t ",token)
+  token <- gsub("^ve\\s","\'ve ",token)
+  token <- gsub("^ll\\s","\'ll ",token)
+  token <- gsub("^re\\s","\'re ",token)
+  return(token)
+}
+
+# collect the top frequent words from unigram table and return in a vector
+
+get_top <- function(n=TOP_FREQ) {
   df1 <- readRDS("unigrams.rds")
   nrows <- nrow(df1)
   vTop <- vector("list", length=25)
@@ -71,7 +85,7 @@ get_top <- function(n=5) {
 # the objective of this function is find the most probable word in a n-gram dataframe , given a group of n last words
 
 find_in_grams <- function(lastW, n) {
-  lastW <- paste0('^',lastW)
+  lastW <- paste0('^',lastW,' ')
   
   # points the search to correspondent 'n-gram' dataframe 
   dfSearch <- data.frame()
@@ -89,9 +103,9 @@ find_in_grams <- function(lastW, n) {
 # print(head(dfsub)); print(nrow(dfsub))
   
   if(nrow(dfsub) > 0) {
-    # if matches, return the 5 top Words (without any spaces)
-    top5words <- head(gsub(lastW,"",dfsub$Word),5)
-#    top5words <- head(dfsub$Word,5)
+    # if matches, return the 5 (or TOP_FREQ) top Words (without any spaces)
+    top5words <- head(contractions(gsub(lastW,"",dfsub$Word)),TOP_FREQ)
+    #top5words <- heuristics(top5words)
     msg <<- sprintf("Next word was predicted with %1d-gram dataframe.",(n+1))
     return( gsub("[[:space:]]"," ",top5words) )
   }
@@ -104,7 +118,6 @@ find_in_grams <- function(lastW, n) {
     else {
       lastW <- substr(lastW,2,nchar(lastW))
       msg <<- paste("Next word not found in 2, 3 or 4-grams dataframes.\nReturning the",TOP_FREQ,"most frequent words of uni-gram.")
-      nGram <<- 1
       return(get_top(TOP_FREQ))
     }
   }
