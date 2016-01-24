@@ -1,7 +1,7 @@
 # Data-Science_Capstone_ShinyApp
 Data Science Capstone Project - Shiny App - Predicting Next Word
 
-## important files
+### important files:
 
 * DataScience_Capstone_NextWord.Rpres =>> R presentation of the 'Next Word' Shiny App
 * app.R =>> source code for Shiny App interface
