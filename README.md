@@ -9,5 +9,5 @@ Data Science Capstone Project - Shiny App - Predicting Next Word
 * www/help.html =>> documentation of the job in HTML5
 * uni-, bi-, tri-, four-grams.rds =>> save R dataframes objects
 
-* benchmark-output.txt =>> output analysis for predict model (benchmarking)
+* [benchmark-output.txt](benchmark-output.txt) =>> output analysis for predict model (benchmarking)
 
