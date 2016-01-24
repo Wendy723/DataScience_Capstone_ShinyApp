@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="Data Science Capstone Project - Shiny App">
+<meta name="keywords" content="NLP, Text Mining, R, Data Science">
+<meta name="author" content="Sergio Vicente">
+<title>Help Documentation - Shiny App - Predicting Next Word</title>
+<link rel="stylesheet" href="./jquery-ui.css">
+<script src="./jquery-1.10.2.js"></script>
+<script src="./jquery-ui.js"></script>
+<script>
+$(function() {
+  $( "#accordion" ).accordion({ 
+	  heightStyle: "content" 
+	})
+});
+</script>
+<style type="text/css">
+.container {height:90%;}
+h3 {font-family:Verdana,sans-serif; font-weight:bolder; font-size:90%;}
+span.bullet {margin-left:-20px; font-size:1.1em; color:blue;}
+ul {background-color:#EFFBF8; padding:0; margin-top:-5px; margin-bottom:-5px;}
+li {font-size:75%;}
+ol, ol.li {background-color:#E0F8F7; padding:0; margin-top:-5px; margin-bottom:-5px;}
+blockquote {width:92%;}
+a  {color:blue;}
+a:hover  {color:blue; text-decoration:none;}
+ol { counter-reset: item }
+ol li { display: block; background-color:white; }
+ol li:before { content: counter(item) ") "; counter-increment:item; font-weight:bolder; 
+  color:navy; margin-left: -15px;}
+li.main   {padding-bottom:8px;}
+li.big  {font-size:12pt; font-style:italic; list-style-type:none; padding-top:5px; background-color:white;}
+</style>
+<base target="_blank">
+</head>
+<body style="font-family:Arial,Helvetica,sans-serif;font-size:0.9em;">
+<div class="container">
+<div id="accordion">
+
+<h3><span class="bullet">&#x2611;</span>&nbsp;Main Features</h3>
+<div>
+   <ul>
+	<li class="main">This is a Shiny app that accepts an user input of a single word or a combination of words and predicts (suggests) the 
+	most probable word(s).</li> 
+	<li class="main">The project was developed using the knowledge on Natural Language Processing (NLP), Text Mining (TM) and Statistical Inference. 
+	They've been acquired by several lectures along the Data Science Specialization courses.</li>
+	<li class="main">The data for this application comes from a Corpus called “<a href='http://corpora.heliohost.org/'>HC Corpora</a>”.</li>
+	<li class="main">Along the job, we used a variety of well-known R packages to practice text mining and natural language processing, such as:<br>
+	1) tm &rarr; <a href="https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf">Text Mining in R</a>;<br>
+	2) quanteda &rarr; <a href="https://cran.r-project.org/web/packages/quanteda/quanteda.pdf">Quantitative Analysis of Textual Data in R</a><br>
+	</li>
+   </ul>
+</div>
+
+<h3><span class="bullet">&#x2611;</span>&nbsp;Product Development</h3>
+<div>
+   <ul>
+	<li>Tasks we needed to perform: sampling, data cleansing, exploratory analysis, predictive modelling and some creative exploration.</li>
+	<li>The HC Corpora data was, initially, reduced by <b>30%</b> using a systematic sampling process. This sample was cleaned by conversion to lowercase, 
+	removing punctuation, links, extra white spaces, numbers and all kinds of special characters. It results in a corpus more meaningful.
+	</li>
+	<li>	The next step was assembling tables of the most frequent n-grams (1-gram, 2-gram, 3-gram, and 4-gram). Each table was sorted according 
+	to the frequency of n-grams (decreasing order).</li>
+	<li><strong>What is 'n-gram'?</strong><br>
+	<a target="_blank" href="https://en.wikipedia.org/wiki/N-gram">From Wikipedia</a>: In the fields of computational linguistics and probability, 
+	an n-gram is a contiguous sequence of n items from a given sequence of text or speech.</li>
+	<li>Despite of having test some methods in 'quanteda' and 'tm' packages, we prefer to 
+	develop our own function to execute this task. It is programmed in this source file - "n-gramming.R". It was the part of the job 
+	that spent more time to be concluded (a whole day, because of the size of the data sample).</li>
+	<li>Those aggregated uni-, bi-, tri- and fourgram term frequency matrices have been passed to data frames and saved in 4 .rds format files.</li>
+	<li>The resulting data frames are used to predict next words in consonance with the text input by the user of 
+	this Shiny App, and also taking account the probability of the n-grams occurrences.</li>
+   </ul>
+</div>
+
+<h3><span class="bullet">&#x2611;</span>&nbsp;The Algorithm</h3>
+<div>
+  <ul>
+    <li>The main strategy to predict the next word(s) is based on "<a href="https://en.wikipedia.org/wiki/Katz's_back-off_model">Katz 
+    Backoff</a>" Algorithm.</li>
+    <li>In fact, due to be more attractive from a computational standpoint, we implement a more simplified approach known 
+    as <strong>"Stupid Backoff"</strong> <span style="font-size:1.1em">&larr;</span>  it always takes the prediction from the highest order n-gram, which its description follows:</li>
+  </ul>
+  <br/>
+  <ol>
+    <li>It uses a 4-grams data frame; the first three words of which are the last three words of the sentence input by the user
+    and that we are trying to predict the next words.<br>The Fourgram data frame is already sorted from highest to lowest frequency.</li>
+    <li>The entered words are matched with the all the 4-grams and the ones matching all the first 3 words, or 2 words are shown on the basis of frequency.</li>
+    <li>If no 4-gram is found, we back off to 3-grams df (first two words of Trigram last two words of the sentence).</li>
+    <li>Recursivelly, If no 3-gram is found, we back off to 2-gram (first word of Bigram last word of the sentence).</li>
+    <li>Lastly, if no 2-gram is found, we back off to Onegram (the most common words with the highest frequency).</li>
+  </ol>
+</div>
+
+<h3><span class="bullet">&#x2611;</span>&nbsp;Other issues and limitations</h3>
+<div>
+   <ul>
+   <li>If the user digit more than three words, only the last three are considered as an initial parameter of predicting model function 
+   (because the largest data frame loaded by the app is a four-gram)</li>
+   <li>If the user has digit profanity words, they are neglected and changed to * (asterisk).</li>
+   <li>The return of 1-gram, in fact, follows the <strong>'Word Cloud'</strong> graphical representation, as 
+          <a href="wordcloud.png">you can see in this picture.</a></li>
+  <li>Sampling the Capstone Dataset we could decrease the size of 583 MBytes (.txt files) to 7,6 MB 
+  - four .rds data files (almost 99% of reduction). It allowed that the Shiny application loads enough database to process
+  an algorithm that produces a fair prediction, with a good performance (less than 1 second).<br>
+  </li>
+    <li class="big">Possible Improvements:</li>
+    <li>Implement, test and compare with other modelling ways to get machine prediction, like interpolated Kneser-Ney Smoothing, pure Katz Back-Off or Good-Turing discounting.<br>
+    (A good material to get deep inside is a lecture from Cornell, cited in References).</li>
+    <li>Adapt to other languages - a preliminary experimental was done with "DE_de" (German) from HC Corpora, but
+    not very successful, yet. <a href="https://svicente99.shinyapps.io/DataScienceCapstone_Shiny_App_DE/">See the <b><em>"DE_version"</em> app</b></a>.
+    I will go forward using <a href="http://corpusbrasileiro.pucsp.br/cb/Inicial.html">Brazilian corpus</a>, my native language.
+    <li>Learn with the user input to get better predictions.</li>
+  </ul>
+</div>
+
+<h3><span class="bullet">&#x2611;</span>&nbsp;References</h3>
+<div>
+   <ul>
+	<li><a href="https://class.coursera.org/dsscapstone-006">Coursera.org - Johns Hopkins University - Data Science Capstone</a>
+	<li><a href="http://rpubs.com/svicente99/DataScienceCapstoneReport">My intermediary report submission to Capstone Project</a>
+	<li><a href="https://class.coursera.org/nlp/lecture">Coursera - Stanford - Natural Language Processing</a>
+	<li><a href="http://www.modsimworld.org/papers/2015/Natural_Language_Processing.pdf">Natural Language Processing: A Model to Predict a Sequence of Words</a>
+	<li><a href="http://bit.ly/1Kq0aWg">Text Mining Infrastructure in R (pdf file)</a>
+	<li><a href="https://en.wikipedia.org/wiki/N-gram">Wikipedia - <em>n</em>-gram</a>
+	<li><a href="http://english.boisestate.edu/johnfry/files/2013/04/bigram-2x2.pdf">Bigrams and Trigrams - Boise State University</a>
+	<li><a href="https://en.wikipedia.org/wiki/Katz's_back-off_model">Wikipedia - Katz's back-off model</a>
+	<li><a href="http://www.aclweb.org/anthology/D07-1090.pdf">Large Language Models in Machine Translation (Stupid Backoff)</a>
+	<li><a href="http://www.cs.cornell.edu/courses/cs4740/2014sp/lectures/smoothing+backoff.pdf">Smoothing, Interpolation and Backoff - Cornell University</a>
+	<li><a href="https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip">Capstone Dataset SwiftKey</a>
+	</ul>
+</div>
+
+</div><!-- end of accordion -->
+</div>
+</body>
+</html>
